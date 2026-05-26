@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>にゃんこタイピング</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #fef0f4;
+      font-family: 'Noto Sans JP', sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cellipse cx='40' cy='50' rx='14' ry='11' fill='%23f9c8d8' opacity='0.4'/%3E%3Ccircle cx='22' cy='32' r='7' fill='%23f9c8d8' opacity='0.4'/%3E%3Ccircle cx='40' cy='26' r='7' fill='%23f9c8d8' opacity='0.4'/%3E%3Ccircle cx='58' cy='32' r='7' fill='%23f9c8d8' opacity='0.4'/%3E%3C/svg%3E");
+    }
+
+    h1 {
+      color: #e07a9a;
+      font-size: 2.4rem;
+      font-family: 'Kaisei Decol', serif;
+      /* ★ふわっとした影をつける */
+      text-shadow: 0 4px 12px rgba(224, 122, 154, 0.25);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ★スタッツをカード風にする */
+    #stats {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem auto;
+      max-width: 600px;
+    }
+
+    #stats span {
+      background: white;
+      border: 2px solid #fbc8d8;
+      border-radius: 999px;
+      padding: 0.5rem 1.4rem;
+      font-size: 1rem;
+      /* ★ぽってりした影 */
+      box-shadow: 0 4px 0 #f5a8c0;
+      font-weight: bold;
+      color: #c0607e;
+    }
+
+    /* ★ステージをふわっと */
+    #stage {
+      background: white;
+      border: 3px solid #fbc8d8;
+      border-radius: 28px;
+      height: 220px;
+      margin: 1rem auto;
+      max-width: 600px;
+      position: relative;
+      overflow: hidden;
+      /* ★下に影をつけてぽってり感を出す */
+      box-shadow: 0 8px 0 #f5a8c0, 0 12px 20px rgba(240, 160, 190, 0.2);
+    }
+
+    /* ★ねこのワードをぷっくり */
+    .cat-word {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cat-emoji {
+      font-size: 2.2rem;
+      /* ★ねこもふわっと影 */
+      filter: drop-shadow(0 3px 4px rgba(200, 100, 140, 0.2));
+    }
+
+    .word-pill {
+      background: #fff0f5;
+      border: 2.5px solid #fbc8d8;
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #d0607e;
+      /* ★ぽってり影 */
+      box-shadow: 0 3px 0 #f5a8c0;
+    }
+
+    /* ★ねこが消えるアニメーション */
+    .cat-pop {
+      animation: pop 0.3s ease forwards;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* ★キラキラ */
+    .sparkle {
+      position: absolute;
+      font-size: 1.2rem;
+      pointer-events: none;
+      animation: sparkle-fly 0.6s ease forwards;
+    }
+
+    @keyframes sparkle-fly {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* ★入力欄をぷっくり */
+    #word-input {
+      padding: 0.75rem 1.4rem;
+      font-size: 1rem;
+      border: 2.5px solid #fbc8d8;
+      border-radius: 999px;
+      outline: none;
+      width: 300px;
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #fff8fb;
+      color: #c0607e;
+      box-shadow: 0 4px 0 #f5a8c0;
+      transition: box-shadow 0.1s, transform 0.1s;
+    }
+
+    #word-input:focus {
+      box-shadow: 0 2px 0 #f5a8c0;
+      transform: translateY(2px);
+    }
+
+    /* ★ボタンをぷっくり */
+    #start-btn {
+      padding: 0.75rem 1.8rem;
+      font-size: 1rem;
+      background-color: #f48aaa;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: bold;
+      /* ★下に影をつけてぽってり感 */
+      box-shadow: 0 5px 0 #d4688a;
+      transition: box-shadow 0.1s, transform 0.1s;
+    }
+
+    /* ★押したときにへこむ */
+    #start-btn:hover {
+      background-color: #f07898;
+    }
+
+    #start-btn:active {
+      box-shadow: 0 2px 0 #d4688a;
+      transform: translateY(3px);
+    }
+
+    /* 終了画面 */
+    #result-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 248, 251, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 24px;
+    }
+
+    #result-overlay .result-emoji {
+      font-size: 3rem;
+    }
+
+    #result-overlay .result-title {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 1.5rem;
+      color: #e07a9a;
+      font-weight: bold;
+    }
+
+    #result-overlay .result-score {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 3rem;
+      color: #e07a9a;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    #result-overlay .result-sub {
+      font-size: 0.85rem;
+      color: #c8a0b0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🐱 にゃんこタイピング</h1>
+  <div id="stats">
+    <span>スコア：<strong id="score">0</strong></span>
+    <span>コンボ：<strong id="combo">0</strong></span>
+    <span>のこり：<strong id="time">30</strong>秒</span>
+  </div>
+  <div id="stage">
+    <p id="message">スタートボタンを押してね！</p>
+  </div>
+  <input id="word-input" type="text" placeholder="ひらがなで入力してエンター！" disabled />
+  <button id="start-btn">スタート ▶</button>
+
+  <script>
+    const WORDS = [
+      { kana: 'ねこ', roma: 'neko' },
+      { kana: 'いぬ', roma: 'inu' },
+      { kana: 'さくら', roma: 'sakura' },
+      { kana: 'つき', roma: 'tsuki' },
+      { kana: 'ほし', roma: 'hoshi' },
+      { kana: 'みず', roma: 'mizu' },
+      { kana: 'はな', roma: 'hana' },
+      { kana: 'そら', roma: 'sora' },
+      { kana: 'ゆき', roma: 'yuki' },
+      { kana: 'うみ', roma: 'umi' },
+    ];
+    const CATS = ['🐱', '🐈', '😺', '😸', '😻'];
+    const SPARKLES = ['✨', '⭐', '🌸', '💫', '🌟'];
+
+    let score = 0, combo = 0, timeLeft = 30;
+    let cats = [];
+
+    const scoreEl = document.getElementById('score');
+    const comboEl = document.getElementById('combo');
+    const timeEl = document.getElementById('time');
+    const input = document.getElementById('word-input');
+    const startBtn = document.getElementById('start-btn');
+    const message = document.getElementById('message');
+    const stage = document.getElementById('stage');
+
+    startBtn.addEventListener('click', function () {
+      score = 0; combo = 0; timeLeft = 30;
+      scoreEl.textContent = 0;
+      comboEl.textContent = 0;
+      timeEl.textContent = 30;
+      cats = [];
+
+      const oldResult = document.getElementById('result-overlay');
+      if (oldResult) oldResult.remove();
+
+      input.disabled = false;
+      input.value = '';
+      input.focus();
+      message.style.display = 'none';
+      startBtn.disabled = true;
+
+      const spawnTimer = setInterval(spawnCat, 2000);
+      const moveTimer = setInterval(moveCats, 40);
+      const countTimer = setInterval(function () {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(spawnTimer);
+          clearInterval(moveTimer);
+          clearInterval(countTimer);
+          endGame();
+        }
+      }, 1000);
+    });
+
+    function spawnCat() {
+      const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+      const cat = CATS[Math.floor(Math.random() * CATS.length)];
+      const el = document.createElement('div');
+      el.className = 'cat-word';
+      const top = 20 + Math.random() * 120;
+      el.style.top = top + 'px';
+      el.style.left = '580px';
+      el.innerHTML = `
+        <div class="cat-emoji">${cat}</div>
+        <div class="word-pill">${word.kana}</div>
+      `;
+      stage.appendChild(el);
+      cats.push({ el, kana: word.kana, x: 580 });
+    }
+
+    function moveCats() {
+      for (let i = cats.length - 1; i >= 0; i--) {
+        cats[i].x -= 1.5;
+        cats[i].el.style.left = cats[i].x + 'px';
+        if (cats[i].x < -120) {
+          cats[i].el.remove();
+          cats.splice(i, 1);
+          combo = 0;
+          comboEl.textContent = 0;
+        }
+      }
+    }
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      const typed = input.value.trim();
+      input.value = '';
+
+      for (let i = 0; i < cats.length; i++) {
+        if (typed === cats[i].kana) {
+          hitCat(i);
+          return;
+        }
+      }
+    });
+
+    // ★ねこをヒットしたときの処理をまとめた関数
+    function hitCat(i) {
+      const cat = cats[i];
+
+      // キラキラエフェクトを出す
+      showSparkles(cat.x, parseFloat(cat.el.style.top));
+
+      // ★ねこにアニメーションクラスをつける
+      cat.el.classList.add('cat-pop');
+
+      // アニメーションが終わったら要素を消す
+      setTimeout(function () {
+        cat.el.remove();
+      }, 300);
+
+      cats.splice(i, 1);
+      score += 10 + combo * 3;
+      combo++;
+      scoreEl.textContent = score;
+      comboEl.textContent = combo;
+    }
+
+    // ★キラキラを表示する関数
+    function showSparkles(x, y) {
+      for (let i = 0; i < 5; i++) {
+        const sp = document.createElement('div');
+        sp.className = 'sparkle';
+        sp.textContent = SPARKLES[Math.floor(Math.random() * SPARKLES.length)];
+
+        // ランダムな方向に飛ばす
+        const dx = (Math.random() - 0.5) * 80;
+        const dy = (Math.random() - 0.5) * 80;
+        sp.style.setProperty('--dx', dx + 'px');
+        sp.style.setProperty('--dy', dy + 'px');
+        sp.style.left = x + 'px';
+        sp.style.top = y + 'px';
+
+        stage.appendChild(sp);
+
+        // アニメーションが終わったら消す
+        setTimeout(function () { sp.remove(); }, 600);
+      }
+    }
+
+    function endGame() {
+      cats.forEach(function (cat) { cat.el.remove(); });
+      cats = [];
+      input.disabled = true;
+      startBtn.disabled = false;
+
+      let emoji, title;
+      if (score >= 150) {
+        emoji = '🏆'; title = 'すごい！タイピングの天才にゃ！';
+      } else if (score >= 80) {
+        emoji = '✨'; title = 'いい感じ！もう少しでパーフェクト！';
+      } else {
+        emoji = '😿'; title = 'もう一回チャレンジ！';
+      }
+
+      const overlay = document.createElement('div');
+      overlay.id = 'result-overlay';
+      overlay.innerHTML = `
+        <div class="result-emoji">${emoji}</div>
+        <div class="result-title">${title}</div>
+        <div class="result-score">${score}<span style="font-size:1.2rem">点</span></div>
+        <div class="result-sub">最高コンボ：${combo}</div>
+      `;
+      stage.appendChild(overlay);
+    }
+  </script>
+
+</body>
+</html>
