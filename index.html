@@ -45,7 +45,6 @@
 
     /* ★ステージをふわっと */
     #stage {
-      background: white;
       border: 3px solid #fbc8d8;
       border-radius: 28px;
       height: 220px;
@@ -53,8 +52,26 @@
       max-width: 600px;
       position: relative;
       overflow: hidden;
-      /* ★下に影をつけてぽってり感を出す */
       box-shadow: 0 8px 0 #f5a8c0, 0 12px 20px rgba(240, 160, 190, 0.2);
+
+      /* ★壁の色 */
+      background-color: #fff0f8;
+    }
+
+    /* ★床 */
+    #stage::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 45px;
+      background: repeating-linear-gradient(90deg,
+          #f5dfc0 0px,
+          #f5dfc0 39px,
+          #e8c9a0 39px,
+          #e8c9a0 40px);
+      border-top: 2px solid #e0b882;
     }
 
     /* ★ねこのワードをぷっくり */
@@ -209,6 +226,85 @@
       font-size: 0.85rem;
       color: #c8a0b0;
     }
+
+    /* ★窓 */
+    #window-deco {
+      position: absolute;
+      top: 12px;
+      left: 20px;
+      width: 80px;
+      height: 90px;
+    }
+
+    #window-sky {
+      background: linear-gradient(180deg, #b8e4f9 0%, #e8f7ff 100%);
+      width: 100%;
+      height: 72px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      border: 2px solid #d0c0b0;
+      border-bottom: none;
+    }
+
+    #window-frame {
+      width: 100%;
+      height: 14px;
+      background: #d0c0b0;
+      border-radius: 0 0 4px 4px;
+      border: 2px solid #d0c0b0;
+      /* ★窓の桟 */
+      background: linear-gradient(90deg,
+          #d0c0b0 0%, #d0c0b0 48%,
+          #e8d8c8 48%, #e8d8c8 52%,
+          #d0c0b0 52%, #d0c0b0 100%);
+    }
+
+    /* ★キャットタワー */
+    #cat-tower {
+      position: absolute;
+      bottom: 45px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .tower-top {
+      background: #f5c8d8;
+      border: 2px solid #e8a0b8;
+      border-radius: 12px;
+      width: 52px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 3px 0 #e8a0b8;
+    }
+
+    .tower-pole {
+      width: 14px;
+      height: 50px;
+      background: repeating-linear-gradient(180deg,
+          #d4a0b8 0px,
+          #d4a0b8 8px,
+          #e8c0d0 8px,
+          #e8c0d0 16px);
+      border-radius: 4px;
+    }
+
+    .tower-base {
+      width: 56px;
+      height: 12px;
+      background: #f5c8d8;
+      border: 2px solid #e8a0b8;
+      border-radius: 6px;
+      box-shadow: 0 3px 0 #e8a0b8;
+    }
   </style>
 </head>
 <body>
@@ -220,6 +316,19 @@
     <span>のこり：<strong id="time">30</strong>秒</span>
   </div>
   <div id="stage">
+    <!-- ★窓 -->
+    <div id="window-deco">
+      <div id="window-sky">🌤</div>
+      <div id="window-frame"></div>
+    </div>
+
+    <!-- ★キャットタワー -->
+    <div id="cat-tower">
+      <div class="tower-top">😺</div>
+      <div class="tower-pole"></div>
+      <div class="tower-base"></div>
+    </div>
+
     <p id="message">スタートボタンを押してね！</p>
   </div>
   <input id="word-input" type="text" placeholder="ひらがなで入力してエンター！" disabled />
